@@ -1,7 +1,8 @@
 {
-  "name": "upaymobile",
+  "name": "UPayMobileLocal",
   "integrations": {
     "cordova": {}
   },
-  "type": "angular"
+  "type": "angular",
+  "id": "f735a6a8"
 }
