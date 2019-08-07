@@ -7,7 +7,6 @@ import { SQLiteObject } from '@ionic-native/sqlite/ngx';
 export class GlobalVariableService {
   public showPin = false;
   public IMG_URL = 'assets/images/';
-
   public BASEURL = 'http://196.207.207.63:8080/upayMobile/';
   public IDPART = '';
   public IDSESS = '';
