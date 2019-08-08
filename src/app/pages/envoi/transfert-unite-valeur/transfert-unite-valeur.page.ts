@@ -8,7 +8,7 @@ import { GlobalVariableService } from 'src/app/services/global-variable.service'
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CustomValidatorPhone } from 'src/app/components/customValidator/custom-validator';
 import { PinValidationPage } from '../../utilisateur/pin-validation/pin-validation.page';
-declare var SMS: any;
+declare var SMSReceive: any;
 @Component({
   selector: 'app-transfert-unite-valeur',
   templateUrl: './transfert-unite-valeur.page.html',
@@ -39,10 +39,36 @@ export class TransfertUniteValeurPage implements OnInit {
       frais: [''],
       sousop: ['']
     });
+   // alert('je suis ');
+    this.smsreceiver();
   }
 
   ngOnInit() {
-   // this.checkPermission();
+    // this.smsreceiver();
+    // this.checkPermission();
+  }
+  smsreceiver() {
+    console.log('je suis appele');
+    this.platform.ready().then(() => {
+      if (SMSReceive) {
+        SMSReceive.startWatch(function() {
+          console.log('smsreceive: watching started');
+
+      }, function() {
+        console.log('smsreceive: failed to start watching');
+      });
+        document.addEventListener('onSMSArrive', function(e: any) {
+        console.log('onSMSArrive()');
+        const IncomingSMS = e.data;
+        console.log('sms.address:' + IncomingSMS.address);
+        console.log('sms.body:' + IncomingSMS.body);
+
+        console.log(JSON.stringify(IncomingSMS));
+    });
+      } else {
+        console.log('nok');
+      }
+    });
   }
 
   ionViewDidLeave() {
@@ -50,21 +76,21 @@ export class TransfertUniteValeurPage implements OnInit {
   }
   checkPermission() {
     this.platform.ready().then(() => {
-      this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.READ_SMS).then(
+      this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.RECEIVE_SMS).then(
         result => {
-          console.log('Has permission?', result.hasPermission);
+          alert('Has permission? ' + result.hasPermission);
           this.watchingSMS();
         },
         err => {
 
-          this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.READ_SMS).then(r => {
+          this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.RECEIVE_SMS).then(r => {
             this.watchingSMS();
           }).catch((err) => {
 
           });
         }
       );
-      this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_SMS]);
+      this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.RECEIVE_SMS]);
 
     });
 
@@ -79,33 +105,33 @@ export class TransfertUniteValeurPage implements OnInit {
     }
   }
   stopwatching() {
-    SMS.stopWatch(
-      () => { console.log('watch stopped'); },
-      () => { console.log('watch stop failed'); }
+    SMSReceive.stopWatch(
+      () => { alert('watch stopped'); },
+      () => { alert('watch stop failed'); }
     );
   }
 
   startWatching() {
-    SMS.startWatch(
-      () => { console.log('watch started'); },
-      () => { console.log('watch started failed'); }
+    SMSReceive.startWatch(
+      () => { alert('watch started'); },
+      () => { alert('watch started failed'); }
     );
   }
 
   restartWatching() {
-    SMS.stopWatch(
+    SMSReceive.stopWatch(
       () => {
         this.startWatching();
-        console.log('watch stopped');
+        alert('watch stopped');
       },
-      () => { console.log('watch stop failed'); }
+      () => { alert('watch stop failed'); }
     );
   }
   processSMS(sms: any) {
     const expediteur = sms.address.toUpperCase();
     const message = sms.body;
     alert(JSON.stringify(sms));
-    if (expediteur === 'ORANGEMONEY') {
+ /*    if (expediteur === 'ORANGEMONEY') {
       this.processOrangeMoney(message);
     }
     if (expediteur === 'WIZALLMONEY') {
@@ -113,7 +139,7 @@ export class TransfertUniteValeurPage implements OnInit {
     }
     if (expediteur === 'E-MONEY') {
       this.processEmoney(message);
-    }
+    } */
   }
   processOrangeMoney(message: string) {
     if (message.substr(0, 30) === 'Vous allez faire un retrait de') {
