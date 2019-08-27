@@ -6,8 +6,7 @@ import { ServiceService } from 'src/app/services/service.service';
 import { Storage } from '@ionic/storage';
 import { GlobalVariableService } from 'src/app/services/global-variable.service';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-
-declare var SMS: any;
+declare var SMSReceive: any;
 @Component({
   selector: 'app-souscription-suite',
   templateUrl: './souscription-suite.page.html',
@@ -38,69 +37,46 @@ export class SouscriptionSuitePage implements OnInit {
       email: [''],
       mode: ['']
     });
+    
   }
   ionViewDidLeave() {
    this.stopwatching();
   }
-  checkPermission() {
+  smsreceiver() {
     this.platform.ready().then(() => {
-      this.androidPermissions.checkPermission(this.androidPermissions.PERMISSION.READ_SMS).then(
-        result => {
-         // alert('Permission ' + JSON.stringify(result));
-          console.log('Has permission?', result.hasPermission);
-          // this.ReadSMSList();
-          this.watchingSMS();
-        },
-        err => {
-          //alert('Permission Erreur ' + JSON.stringify(err));
-          this.androidPermissions.requestPermission(this.androidPermissions.PERMISSION.READ_SMS).then(r => {
-            this.watchingSMS();
-          }).catch((err) => {
-           // alert('Permission Erreur2 ' + JSON.stringify(err));
-          });
-        }
-      );
-
-      this.androidPermissions.requestPermissions([this.androidPermissions.PERMISSION.READ_SMS]);
-
-    });
-
-  }
-
-  watchingSMS() {
-    if ((/(ipad|iphone|ipod|android)/i.test(navigator.userAgent))) {
+      if (SMSReceive) {
       this.startWatching();
       document.addEventListener('onSMSArrive', (e: any) => {
-
-        const sms: any = e.data;
-        const expediteur = sms.address.toUpperCase();
-        const message = sms.body;
-        if (expediteur === 'UPay') {
-          this.Userdata.controls.codeotp.setValue(message.substring(message.length - 4));
-          setTimeout(() => {
-            this.restartWatching();
-          }, 200);
-        }
-      });
-    }
+        const IncomingSMS = e.data;
+        const message = IncomingSMS.body;
+        this.Userdata.controls.codeotp.setValue(message.substring(message.length - 4));
+  
+    });
+      } else {
+        this.serv.showError('Impossible de lire un sms entrant');
+        alert('nok');
+      }
+    });
   }
 
+
+
   stopwatching() {
-    SMS.stopWatch(
+    SMSReceive.stopWatch(
       () => { console.log('watch stopped'); },
       () => { console.log('watch stop failed'); }
     );
   }
 
   startWatching() {
-    SMS.startWatch(
+    SMSReceive.startWatch(
       () => { console.log('watch started'); },
       () => { console.log('watch started failed'); }
     );
   }
 
   restartWatching() {
-    SMS.stopWatch(
+    SMSReceive.stopWatch(
       () => {
         this.startWatching();
         console.log('watch stopped');
@@ -117,6 +93,7 @@ export class SouscriptionSuitePage implements OnInit {
     this.Userdata.controls.email.setValue(this.commingData.email);
     this.Userdata.controls.mode.setValue(this.commingData.mode);
     console.log(JSON.stringify(this.Userdata.getRawValue()));
+    this.smsreceiver();
   }
   verifConfPin() {
 

@@ -8,7 +8,7 @@ import { GlobalVariableService } from 'src/app/services/global-variable.service'
 })
 export class EnvoiPage implements OnInit {
   public envoiServices;
-  public headerTitle = 'j\'envoie';
+  public headerTitle = 'envoi';
   constructor(public glbVariable: GlobalVariableService) { }
 
   ngOnInit() {

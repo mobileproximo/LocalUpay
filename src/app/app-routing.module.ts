@@ -10,7 +10,8 @@ const routes: Routes = [
   { path: 'favoris', loadChildren: './pages/favoris/favoris.module#FavorisPageModule' },
   { path: 'utilisateur', loadChildren: './pages/utilisateur/utilisateur.module#UtilisateurPageModule' },
   { path: 'historique', loadChildren: './pages/historique/historique.module#HistoriquePageModule' },
-  { path: 'compte', loadChildren: './pages/compte/compte.module#ComptePageModule' }
+  { path: 'compte', loadChildren: './pages/compte/compte.module#ComptePageModule' },
+  { path: 'test', loadChildren: './test/test.module#TestPageModule' }
 ];
 
 @NgModule({

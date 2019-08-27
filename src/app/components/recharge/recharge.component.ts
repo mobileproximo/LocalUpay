@@ -220,7 +220,6 @@ export class RechargeComponent implements OnInit {
             e.onDidDismiss().then(() => {
               this.getrecent();
             });
-
           });
 
           this.getrecent();

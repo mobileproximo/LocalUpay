@@ -17,5 +17,9 @@ export class BienvenuePage implements OnInit {
   accueil(){
     this.navCtrl.navigateRoot('utilisateur/acceuil');
   }
+  verscompte(){
+    this.navCtrl.navigateForward('compte');
+  }
 
 }
+

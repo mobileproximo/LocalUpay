@@ -548,9 +548,20 @@ export class ServiceService {
         this.http.setRequestTimeout(90);
         return this.http.post(url, body, headers);
       }
+    }
 
-
-
-
+    generateUniqueId() {
+      const length = 8;
+      const timestamp = +new Date;
+      const ts = timestamp.toString();
+      const parts = ts.split( '' ).reverse();
+      let id = '';
+      for ( let i = 0; i < length; ++i ) {
+        const min = 0;
+        const max = parts.length - 1;
+        const index = Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+        id += parts[index];
+      }
+      return id;
     }
 }

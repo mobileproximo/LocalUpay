@@ -57,7 +57,7 @@ export class AcceuilPage implements OnInit {
   }
 
   mescartes() {
-    this.navCtrl.navigateForward('mescartes');
+    this.navCtrl.navigateForward('compte');
   }
 
 }

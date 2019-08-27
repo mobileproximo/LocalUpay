@@ -13,12 +13,16 @@ export class OperatorImagePipe implements PipeTransform {
       i++;
     }
     if (i < OperatorsImages.length) {
+      if (codeOper === '0005' && codeSousop === '5') {
+      return this.src + 'omoney.png';
+      }
       if (codeOper === '0057' && codeSousop === '2') {
       return this.src + 'logo_rapido.png';
-      } else {
-      return OperatorsImages[i].image;
       }
+      return OperatorsImages[i].image;
+
       } else { return this.src + 'logo-upay-portrait.png'; }
     }
 
 }
+

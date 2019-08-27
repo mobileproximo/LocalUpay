@@ -8,6 +8,7 @@ import { GlobalVariableService } from 'src/app/services/global-variable.service'
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CustomValidatorPhone } from 'src/app/components/customValidator/custom-validator';
 import { PinValidationPage } from '../../utilisateur/pin-validation/pin-validation.page';
+import { ConfirmationComponent } from 'src/app/components/confirmation/confirmation.component';
 declare var SMSReceive: any;
 @Component({
   selector: 'app-transfert-unite-valeur',
@@ -20,6 +21,7 @@ export class TransfertUniteValeurPage implements OnInit {
   numtrx: any;
   sousop: any;
   idtrxEmoney: any;
+  codepin = '';
   public rechargeForm: FormGroup;
   private listeServiceDisponible = ['0005', '0054', '0057', '0053', '0022'];
   constructor(public androidPermissions: AndroidPermissions,
@@ -48,25 +50,16 @@ export class TransfertUniteValeurPage implements OnInit {
     // this.checkPermission();
   }
   smsreceiver() {
-    console.log('je suis appele');
     this.platform.ready().then(() => {
       if (SMSReceive) {
-        SMSReceive.startWatch(function() {
-          console.log('smsreceive: watching started');
-
-      }, function() {
-        console.log('smsreceive: failed to start watching');
-      });
-        document.addEventListener('onSMSArrive', function(e: any) {
-        console.log('onSMSArrive()');
+      this.startWatching();
+      document.addEventListener('onSMSArrive', (e: any) => {
         const IncomingSMS = e.data;
-        console.log('sms.address:' + IncomingSMS.address);
-        console.log('sms.body:' + IncomingSMS.body);
-
-        console.log(JSON.stringify(IncomingSMS));
+        this.processSMS(IncomingSMS);
     });
       } else {
-        console.log('nok');
+        this.serv.showError('Impossible de lire un sms entrant');
+        alert('nok');
       }
     });
   }
@@ -113,8 +106,8 @@ export class TransfertUniteValeurPage implements OnInit {
 
   startWatching() {
     SMSReceive.startWatch(
-      () => { alert('watch started'); },
-      () => { alert('watch started failed'); }
+      () => {  },
+      () => {  }
     );
   }
 
@@ -122,16 +115,15 @@ export class TransfertUniteValeurPage implements OnInit {
     SMSReceive.stopWatch(
       () => {
         this.startWatching();
-        alert('watch stopped');
       },
-      () => { alert('watch stop failed'); }
+      () => {  }
     );
   }
   processSMS(sms: any) {
     const expediteur = sms.address.toUpperCase();
     const message = sms.body;
     alert(JSON.stringify(sms));
- /*    if (expediteur === 'ORANGEMONEY') {
+    if (expediteur === 'ORANGEMONEY') {
       this.processOrangeMoney(message);
     }
     if (expediteur === 'WIZALLMONEY') {
@@ -139,8 +131,23 @@ export class TransfertUniteValeurPage implements OnInit {
     }
     if (expediteur === 'E-MONEY') {
       this.processEmoney(message);
-    } */
+    }
+    if (expediteur === 'POSTECASH') {
+      this.processpostecash(message);
+    }
+    if (expediteur === 'TIGO-CASH') {
+      this.processTigoCash(message);
+    }
+/*     setTimeout(() => {
+      this.restartWatching();
+    }, 200); */
   }
+  processTigoCash(message: string) {
+    if (message.includes('Paiement pour MERCHAND (' + this.glb.ATPSTIGOIDMERCHAND + ')')) {
+      this.cashinUPay();
+    }
+  }
+
   processOrangeMoney(message: string) {
     if (message.substr(0, 30) === 'Vous allez faire un retrait de') {
       setTimeout(() => {
@@ -198,14 +205,13 @@ export class TransfertUniteValeurPage implements OnInit {
   processEmoney(message: string) {
     if (message.indexOf('OTP') !== -1) {
       setTimeout(() => {
-        // const otp = message.substring(message.indexOf('OTP:') + 5, message.indexOf('. Ref:'));
+        const otp = message.substring(message.indexOf('OTP:') + 5, message.indexOf('. Ref:'));
         const parametres: any = {};
         parametres.recharge = {};
         parametres.recharge.numtrx = this.idtrxEmoney;
-        //  parametres.recharge.codevalidation    = otp;
-        //  parametres.recharge.montant   = this.rechargeForm.controls.montantrlv.value.replace(/ /g, '');
+        parametres.recharge.codevalidation    = otp;
+        parametres.recharge.montant   = this.rechargeForm.controls.montantrlv.value.replace(/ /g, '');
         this.serv.posts('recharge/validationemoney.php', parametres, {}).then(data => {
-          // this.serv.dismissloadin();
           const reponse = JSON.parse(data.data);
           if (reponse.returnCode) {
 
@@ -215,7 +221,6 @@ export class TransfertUniteValeurPage implements OnInit {
           } else {
             this.serv.dismissloadin();
             this.serv.showError('Reponse inattendue');
-
           }
         }).catch(err => {
           this.serv.dismissloadin();
@@ -231,7 +236,36 @@ export class TransfertUniteValeurPage implements OnInit {
 
     }
   }
+  processpostecash(message) {
+    if (message.substr(0, 42) === 'Vous avez effectue une demande de debit de') {
+      const v = message.substr(message.indexOf(':') + 2, message.indexOf('.'));
+      const otp = v.substr(0, v.indexOf('.'));
+      const parametre: any = {};
+      parametre.recharge = {};
+      parametre.recharge.telephone = this.glb.PHONE;
+      parametre.recharge.codevalidation = otp;
+      parametre.recharge.montant = this.rechargeForm.controls.montantrlv.value.replace(/ /g, '');
+      parametre.recharge.pin = this.codepin;
+      parametre.idTerm = this.glb.IDTERM;
+      parametre.session = this.glb.IDSESS;
+      this.serv.posts('recharge/retraitpostcash.php', parametre, {}).then(data => {
+          this.serv.dismissloadin();
+          const reponse = JSON.parse(data.data);
+          if (reponse.returnCode === '0') {
+            this.numtrx = this.glb.PHONE;
+            this.glb.HEADER.montant = this.millier.transform(reponse.mntPlfap);
+            this.cashinUPay();
+          } else {
+            this.serv.showError(reponse.errorLabel);
+          }
+        }).catch(err => {
+          this.serv.dismissloadin();
+          this.serv.showError('Impossible d\'atteindre le serveur');
+        });
 
+
+     }
+  }
   cashinUPay() {
     const parametres: any = {};
     parametres.recharge = {};
@@ -249,15 +283,21 @@ export class TransfertUniteValeurPage implements OnInit {
       const reponse = JSON.parse(data.data);
       if (reponse.returnCode) {
         if (reponse.returnCode === '0') {
-          // alert('cashin UPAY' + JSON.stringify(reponse) );
-          // this.glb.recu = reponse;
-          // this.glb.recu.guichet = this.glb.IDTERM.substring(5, 6);
-          // this.glb.recu.agence = this.glb.HEADER.agence;
-          this.glb.showRecu = true;
           this.glb.HEADER.montant = this.millier.transform(reponse.mntPlfap);
           this.glb.dateUpdate = this.serv.getCurrentDate();
-         // this.glb.recu.service = 'Cashin UPay';
-          // this.glb.recu.Oper = 'UPay';
+          parametres.recharge.montant    = this.millier.transform(parametres.recharge.montant);
+          parametres.recharge.nameContact = this.glb.PRENOM + ' ' + this.glb.NOM;
+          parametres.recharge.label = 'N° Tel';
+          const mod = this.modal.create({
+            component: ConfirmationComponent,
+            componentProps: {
+              data: parametres.recharge,
+            }
+          }).then((e) => {
+            e.present();
+            e.onDidDismiss().then(() => {
+            });
+          });
         } else {
           this.serv.showError(reponse.errorLabel);
         }
@@ -286,6 +326,7 @@ export class TransfertUniteValeurPage implements OnInit {
       });
       modal.onDidDismiss().then((codepin) => {
         if (codepin !== null && codepin.data) {
+          this.codepin = codepin.data;
           this.initier();
         } else {
           this.glb.ShowSolde = false;
@@ -393,6 +434,19 @@ export class TransfertUniteValeurPage implements OnInit {
           });
         break;
       }
+      case '0022' : {
+        this.serv.afficheloadingWithExit();
+        setTimeout(() => {
+          const  reference = this.serv.generateUniqueId();
+          const commande = '#150*4*6*' + this.glb.ATPSTIGOIDMERCHAND + '*' + reference + '*1#';
+          this.callNumber.callNumber(commande, true)
+            .then(res => { })
+            .catch(err => {
+              this.serv.dismissloadin();
+            });
+        }, 200);
+        break;
+      }
       default: {
         this.serv.showAlert('Service en cours developpement');
         break;
@@ -400,5 +454,7 @@ export class TransfertUniteValeurPage implements OnInit {
     }
 
   }
+
+
 
 }

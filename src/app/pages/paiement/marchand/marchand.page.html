@@ -1,5 +1,33 @@
 <app-header [headerTitle]="headerTitle"></app-header>
 <ion-content>
+    <form class="formulaire" [formGroup]="rechargeForm">
+        <div style="padding-top: 15px">
+
+            <div class="formdiv">
+                <label>Choisir Compte marchand * </label>
+                <ion-select formControlName="oper" style="--padding-start:0px; --padding-bottom: 0px" interface="popover">
+                    <ion-select-option [value]="operateur.codeoper" *ngFor='let operateur of listeServiceDisponible'>
+                        {{operateur.nomoper}}</ion-select-option>
+                </ion-select>
+                <div></div>
+            </div>
+            <div class="formdiv releve">
+                <label>Saisir Code marchand * </label>
+                <input type="text" formControlName="codemarchand" placeholder="Entrer le code du marchand" />
+                <div></div>
+            </div>
+
+            <div class="formdiv releve">
+                <label>Saisir Montant à payer * </label>
+                <input type="number" formControlName="montant" placeholder="Entrer le montant ici" />
+                <div></div>
+            </div>
+
+        </div>
+
+        <div style="padding: 15px" class="flex2 flexcenter" id="btncontrol">
+            <button (click)='showpin()' style="height: 46px;width: 100%;border-radius: 5px;" id="btnsvt" [style.background]="rechargeForm.invalid ? '#CFD8DC' : '#074A94'" class="btnbleu">Valider</button>
+        </div>
+    </form>
 </ion-content>
 <app-footer></app-footer>
-
