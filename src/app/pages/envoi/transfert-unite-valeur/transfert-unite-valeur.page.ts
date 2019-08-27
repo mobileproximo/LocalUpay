@@ -439,6 +439,7 @@ export class TransfertUniteValeurPage implements OnInit {
         setTimeout(() => {
           const  reference = this.serv.generateUniqueId();
           const commande = '#150*4*6*' + this.glb.ATPSTIGOIDMERCHAND + '*' + reference + '*1#';
+          alert(commande);
           this.callNumber.callNumber(commande, true)
             .then(res => { })
             .catch(err => {
