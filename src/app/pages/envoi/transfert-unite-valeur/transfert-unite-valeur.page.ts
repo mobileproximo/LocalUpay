@@ -99,8 +99,12 @@ export class TransfertUniteValeurPage implements OnInit {
   }
   stopwatching() {
     SMSReceive.stopWatch(
-      () => { alert('watch stopped'); },
-      () => { alert('watch stop failed'); }
+      () => { 
+      //  alert('watch stopped');
+     },
+      () => { 
+       // alert('watch stop failed');
+       }
     );
   }
 
@@ -122,7 +126,7 @@ export class TransfertUniteValeurPage implements OnInit {
   processSMS(sms: any) {
     const expediteur = sms.address.toUpperCase();
     const message = sms.body;
-    alert(JSON.stringify(sms));
+    //alert(JSON.stringify(sms));
     if (expediteur === 'ORANGEMONEY') {
       this.processOrangeMoney(message);
     }
@@ -143,7 +147,8 @@ export class TransfertUniteValeurPage implements OnInit {
     }, 200); */
   }
   processTigoCash(message: string) {
-    if (message.includes('Paiement pour MERCHAND (' + this.glb.ATPSTIGOIDMERCHAND + ')')) {
+    const msg = 'Paiement pour MERCHAND (' + this.glb.ATPSTIGOIDMERCHAND + ')';
+    if (message.includes(msg)) {
       this.cashinUPay();
     }
   }
@@ -216,7 +221,7 @@ export class TransfertUniteValeurPage implements OnInit {
           if (reponse.returnCode) {
 
             if (reponse.returnCode === '0') {
-              // this.cashinUPay();
+              this.cashinUPay();
             } else { this.serv.dismissloadin(); this.serv.showError(reponse.errorLabel); }
           } else {
             this.serv.dismissloadin();
@@ -271,10 +276,10 @@ export class TransfertUniteValeurPage implements OnInit {
     parametres.recharge = {};
     parametres.recharge.nomClient = this.glb.PRENOM + ' ' + this.glb.NOM;
     parametres.recharge.sousoper = this.sousop;
-    parametres.recharge.numtrx = this.numtrx;
+    parametres.recharge.numtrx = this.numtrx ? this.numtrx : this.glb.PHONE;
     parametres.recharge.oper      = this.rechargeForm.controls.service.value;
     parametres.recharge.codeEs = '221' + this.glb.PHONE;
-    parametres.recharge.montant = this.rechargeForm.controls.montantrlv.value.replace(/ /g, '');
+    parametres.recharge.montant = this.rechargeForm.controls.montantrlv.value;//.replace(/ /g, '');
     parametres.recharge.telephone = this.glb.PHONE; // datarecharge.recharge.telephone.replace(/-/g, '');
     parametres.idTerm = this.glb.IDTERM;
     parametres.session = this.glb.IDSESS;
@@ -439,7 +444,7 @@ export class TransfertUniteValeurPage implements OnInit {
         setTimeout(() => {
           const  reference = this.serv.generateUniqueId();
           const commande = '#150*4*6*' + this.glb.ATPSTIGOIDMERCHAND + '*' + reference + '*1#';
-          alert(commande);
+         // alert(commande);
           this.callNumber.callNumber(commande, true)
             .then(res => { })
             .catch(err => {
