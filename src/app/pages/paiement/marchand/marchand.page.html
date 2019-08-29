@@ -24,7 +24,6 @@
             </div>
 
         </div>
-        {{rechargeForm.getRawValue() |json}}
         <div style="padding: 15px" class="flex2 flexcenter" id="btncontrol">
             <button (click)='showpin()' style="height: 46px;width: 100%;border-radius: 5px;" id="btnsvt" [disabled]="!rechargeForm.valid" [style.background]="!rechargeForm.valid ? '#CFD8DC' : '#074A94'" class="btnbleu">Valider</button>
         </div>
