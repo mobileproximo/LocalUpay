@@ -26,7 +26,7 @@ export class MarchandPage implements OnInit {
       oper: ['0005', Validators.required],
       nomoperateur: [''],
       pays: ['SN', Validators.required],
-      pin: ['', Validators.required],
+      pin: ['1', Validators.required],
 
     });
   }
