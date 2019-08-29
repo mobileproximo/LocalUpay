@@ -61,6 +61,7 @@ export class MarchandPage implements OnInit {
     this.serv.posts('recharge/paiementmarchand.php', parametres, {}).then(data => {
       this.serv.dismissloadin();
       const reponse = JSON.parse(data.data);
+      alert('reponse ' + JSON.stringify(reponse));
       if (reponse.returnCode) {
         if (reponse.returnCode === '0') {
         }
