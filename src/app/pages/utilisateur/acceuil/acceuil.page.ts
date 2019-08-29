@@ -52,12 +52,13 @@ export class AcceuilPage implements OnInit {
     this.navCtrl.navigateForward(chemin);
   }
 
-  historique() {
-    this.navCtrl.navigateForward('historique');
-  }
+
 
   mescartes() {
     this.navCtrl.navigateForward('compte');
+  }
+  historique(){
+    this.navcrtl.navigateForward('historique');
   }
 
 }
