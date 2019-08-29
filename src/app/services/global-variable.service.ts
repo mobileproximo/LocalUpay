@@ -52,7 +52,7 @@ export class GlobalVariableService {
   // tslint:disable-next-line: max-line-length
   { codeoper: '0057', image: this.IMG_URL + 'wizall.png', sousop: '' }, { codeoper: '0016', image: this.IMG_URL + 'sde2.png', sousop: '' }, { codeoper: '0034', image: this.IMG_URL + 'logo_Expresso.png', sousop: '' },
   // tslint:disable-next-line: max-line-length
-  { codeoper: '0027', image: this.IMG_URL + 'Petite-Icon-24.png', sousop: '' }, { codeoper: '0029', image: this.IMG_URL + 'woyofal.png', sousop: '' }, { codeoper: '0020', image: this.IMG_URL + 'tigo.png', sousop: '' },
+  { codeoper: '0027', image: this.IMG_URL + 'Petite-Icon-24.png', sousop: '' }, { codeoper: '0029', image: this.IMG_URL + 'woyofal.png', sousop: '' }, { codeoper: '0020', image: this.IMG_URL + 'logo_Tigo.png', sousop: '' },
   // tslint:disable-next-line: max-line-length
   { codeoper: '0005', image: this.IMG_URL + 'logo_Orange.png', sousop: '' }, { codeoper: '0057', image: this.IMG_URL + 'logo_rapido.png', sousop: '0002' }, { codeoper: '0052', image: this.IMG_URL + 'logo_Proxicash.png', sousop: '' },
   ];
