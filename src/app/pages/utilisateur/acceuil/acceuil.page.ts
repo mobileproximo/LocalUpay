@@ -58,7 +58,7 @@ export class AcceuilPage implements OnInit {
     this.navCtrl.navigateForward('compte');
   }
   historique(){
-    this.navcrtl.navigateForward('historique');
+    this.navCtrl.navigateForward('historique');
   }
 
 }
