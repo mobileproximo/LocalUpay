@@ -66,9 +66,11 @@ export class MarchandPage implements OnInit {
       this.serv.dismissloadin();
       const reponse = JSON.parse(data.data);
       if (reponse.returnCode) {
-        if (reponse.returnCode === '0') {
-          this.rechargeForm.reset();
+        if (reponse.returnCode === '0') { 
           this.rechargeForm.controls.oper.setValue('0005');
+          this.rechargeForm.controls.pin.setValue('');
+          this.rechargeForm.controls.montant.setValue('');
+          this.rechargeForm.controls.codemarchand.setValue('');
           this.glb.HEADER.montant = this.millier.transform(reponse.mntPlfap);
           this.glb.dateUpdate = this.serv.getCurrentDate();
           parametres.recharge.montant = this.millier.transform(reponse.montant);
