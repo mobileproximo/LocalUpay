@@ -29,7 +29,7 @@ export class MarchandPage implements OnInit {
       oper: ['0005', Validators.required],
       nomoperateur: [''],
       pays: ['SN', Validators.required],
-      pin: ['1', Validators.required],
+      pin: [''],
 
     });
   }
@@ -57,6 +57,7 @@ export class MarchandPage implements OnInit {
     const parametres: any = {};
     this.rechargeForm.controls.nomoperateur.setValue(this.getNomoperateur());
     parametres.recharge = this.rechargeForm.getRawValue();
+    parametres.recharge.clientmarchandCode = parametres.recharge.oper === '0005' ? '01' : '02';
     parametres.idTerm = this.glb.IDTERM;
     parametres.session = this.glb.IDSESS;
     console.log(JSON.stringify(parametres));
@@ -67,6 +68,7 @@ export class MarchandPage implements OnInit {
       if (reponse.returnCode) {
         if (reponse.returnCode === '0') {
           this.rechargeForm.reset();
+          this.rechargeForm.controls.oper.setValue('0005');
           this.glb.HEADER.montant = this.millier.transform(reponse.mntPlfap);
           this.glb.dateUpdate = this.serv.getCurrentDate();
           parametres.recharge.montant = this.millier.transform(reponse.montant);
