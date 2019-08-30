@@ -5,6 +5,8 @@ import { PinValidationPage } from '../../utilisateur/pin-validation/pin-validati
 import { ModalController } from '@ionic/angular';
 import { GlobalVariableService } from 'src/app/services/global-variable.service';
 import { ServiceService } from 'src/app/services/service.service';
+import { ConfirmationComponent } from 'src/app/components/confirmation/confirmation.component';
+import { MillierPipe } from 'src/app/pipes/millier.pipe';
 
 @Component({
   selector: 'app-marchand',
@@ -14,10 +16,11 @@ import { ServiceService } from 'src/app/services/service.service';
 export class MarchandPage implements OnInit {
   public headerTitle = 'marchand';
   public rechargeForm: FormGroup;
-  public listeServiceDisponible = [{nomoper: 'Orange Money', codeoper: '0005'}, {nomoper: 'Tigo Cash', codeoper: '0022'}];
+  public listeServiceDisponible = [{ nomoper: 'Orange Money', codeoper: '0005' }, { nomoper: 'Tigo Cash', codeoper: '0022' }];
   codepin: any;
   constructor(private formBuilder: FormBuilder,
               private modal: ModalController,
+              private millier: MillierPipe,
               private glb: GlobalVariableService,
               private serv: ServiceService) {
     this.rechargeForm = this.formBuilder.group({
@@ -34,21 +37,21 @@ export class MarchandPage implements OnInit {
   ngOnInit() {
   }
 
- async showpin() {
-  this.rechargeForm.controls.pin.setValue('');
-  const modal = await this.modal.create({
-        component: PinValidationPage,
-        backdropDismiss: true
-      });
-  modal.onDidDismiss().then((codepin) => {
-        if (codepin !== null && codepin.data) {
-          this.rechargeForm.controls.pin.setValue(codepin.data);
-          this.paiementmarchand();
-        } else {
-          this.glb.ShowSolde = false;
-        }
-      });
-  return await modal.present();
+  async showpin() {
+    this.rechargeForm.controls.pin.setValue('');
+    const modal = await this.modal.create({
+      component: PinValidationPage,
+      backdropDismiss: true
+    });
+    modal.onDidDismiss().then((codepin) => {
+      if (codepin !== null && codepin.data) {
+        this.rechargeForm.controls.pin.setValue(codepin.data);
+        this.paiementmarchand();
+      } else {
+        this.glb.ShowSolde = false;
+      }
+    });
+    return await modal.present();
   }
   paiementmarchand() {
     const parametres: any = {};
@@ -61,26 +64,49 @@ export class MarchandPage implements OnInit {
     this.serv.posts('recharge/paiementmarchand.php', parametres, {}).then(data => {
       this.serv.dismissloadin();
       const reponse = JSON.parse(data.data);
-      alert('reponse ' + JSON.stringify(reponse));
       if (reponse.returnCode) {
         if (reponse.returnCode === '0') {
+          this.rechargeForm.reset();
+          this.glb.HEADER.montant = this.millier.transform(reponse.mntPlfap);
+          this.glb.dateUpdate = this.serv.getCurrentDate();
+          parametres.recharge.montant = this.millier.transform(reponse.montant);
+          parametres.recharge.frais = this.millier.transform(reponse.frais);
+          parametres.recharge.nameContact = this.glb.PRENOM + ' ' + this.glb.NOM;
+          parametres.recharge.label = 'Code Marchand';
+          parametres.recharge.telephone = reponse.telephone;
+          parametres.recharge.montantTotal = this.millier.transform(reponse.montantTTC);
+          const mod = this.modal.create({
+            component: ConfirmationComponent,
+            componentProps: {
+              data: parametres.recharge,
+            }
+          }).then((e) => {
+            e.present();
+            e.onDidDismiss().then(() => {
+            });
+          });
+        } else {
+          this.serv.showError(reponse.errorLabel);
         }
       }
-    })
-    .catch(err => {
-      if (err.status === 500) {
-        this.serv.showError('Une erreur interne s\'est produite ERREUR 500');
-      } else {
-        this.serv.showError('Impossible d\'atteindre le serveur veuillez réessayer');
+      else {
+        this.serv.showError('Reponse inattendue  ');
       }
+    })
+      .catch(err => {
+        if (err.status === 500) {
+          this.serv.showError('Une erreur interne s\'est produite ERREUR 500');
+        } else {
+          this.serv.showError('Impossible d\'atteindre le serveur veuillez réessayer');
+        }
 
-    });
+      });
   }
   getNomoperateur() {
     let i = 0;
     const codeoper = this.rechargeForm.controls.oper.value;
     while (i < this.listeServiceDisponible.length && this.listeServiceDisponible[i].codeoper != codeoper) {
-    i++;
+      i++;
     }
     return this.listeServiceDisponible[i].nomoper;
   }

@@ -288,6 +288,7 @@ export class TransfertUniteValeurPage implements OnInit {
       const reponse = JSON.parse(data.data);
       if (reponse.returnCode) {
         if (reponse.returnCode === '0') {
+          this.rechargeForm.reset();
           this.glb.HEADER.montant = this.millier.transform(reponse.mntPlfap);
           this.glb.dateUpdate = this.serv.getCurrentDate();
           parametres.recharge.montant    = this.millier.transform(parametres.recharge.montant);
