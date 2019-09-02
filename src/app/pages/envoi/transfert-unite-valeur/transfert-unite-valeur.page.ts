@@ -455,6 +455,7 @@ initOperation(service: string) {
     const reponse = JSON.parse(data.data);
     if (reponse.returnCode) {
       if (reponse.returnCode === '0') {
+        alert(JSON.stringify(reponse));
         if (service === '0054') {
           this.idtrxEmoney = reponse.numtrx;
         }
