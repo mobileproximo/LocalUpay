@@ -241,7 +241,7 @@ export class TransfertUniteValeurPage implements OnInit {
 
     }
   }
-  processpostecash(message: { substr: { (arg0: number, arg1: number): string; (arg0: any, arg1: any): void; }; indexOf: { (arg0: string): number; (arg0: string): void; }; }) {
+  processpostecash(message) {
     if (message.substr(0, 42) === 'Vous avez effectue une demande de debit de') {
       const v = message.substr(message.indexOf(':') + 2, message.indexOf('.'));
       const otp = v.substr(0, v.indexOf('.'));
@@ -425,7 +425,7 @@ export class TransfertUniteValeurPage implements OnInit {
     }
 
   }
-lancementussd(service: string){
+lancementussd(service: string) {
   this.serv.afficheloadingWithExit();
   setTimeout(() => {
     const  reference = this.serv.generateUniqueId();
@@ -440,7 +440,7 @@ lancementussd(service: string){
       });
   }, 200);
 }
-initOperation(service: string){
+initOperation(service: string) {
   const transfert = { montant: this.rechargeForm.controls.montantrlv.value, telSource: this.glb.PHONE, opersource: service };
   const params = {
     transfert,
@@ -451,7 +451,7 @@ initOperation(service: string){
   data.idTerm = this.glb.IDTERM;
   data.session = this.glb.IDSESS;
   this.serv.afficheloadingWithExit();
-  this.serv.posts('recharge/initcashoutoper.php', params, {}).then((data: { data: string; }) => {
+  this.serv.posts('recharge/initcashoutoper.php', params, {}).then((data) => {
     const reponse = JSON.parse(data.data);
     if (reponse.returnCode) {
       if (reponse.returnCode === '0') {
@@ -460,10 +460,12 @@ initOperation(service: string){
         }
 
       } else {
+        this.serv.dismissloadin();
         this.serv.showError(reponse.errorLabel);
       }
 
     } else {
+      this.serv.dismissloadin();
       this.serv.showError('Reponse inattendue ');
     }
   }
