@@ -99,10 +99,10 @@ export class TransfertUniteValeurPage implements OnInit {
   }
   stopwatching() {
     SMSReceive.stopWatch(
-      () => { 
+      () => {
       //  alert('watch stopped');
      },
-      () => { 
+      () => {
        // alert('watch stop failed');
        }
     );
@@ -126,7 +126,7 @@ export class TransfertUniteValeurPage implements OnInit {
   processSMS(sms: any) {
     const expediteur = sms.address.toUpperCase();
     const message = sms.body;
-    //alert(JSON.stringify(sms));
+    // alert(JSON.stringify(sms));
     if (expediteur === 'ORANGEMONEY') {
       this.processOrangeMoney(message);
     }
@@ -147,7 +147,7 @@ export class TransfertUniteValeurPage implements OnInit {
     }, 200); */
   }
   processTigoCash(message: string) {
-    const msg = 'Paiement pour MERCHAND (' + this.glb.ATPSTIGOIDMERCHAND + ')';
+    const msg = 'Paiement pour MERCHAND (' + this.glb.ATPS_TIGO_IDMERCHAND + ')';
     if (message.includes(msg)) {
       this.cashinUPay();
     }
@@ -279,7 +279,7 @@ export class TransfertUniteValeurPage implements OnInit {
     parametres.recharge.numtrx = this.numtrx ? this.numtrx : this.glb.PHONE;
     parametres.recharge.oper      = this.rechargeForm.controls.service.value;
     parametres.recharge.codeEs = '221' + this.glb.PHONE;
-    parametres.recharge.montant = this.rechargeForm.controls.montantrlv.value;//.replace(/ /g, '');
+    parametres.recharge.montant = this.rechargeForm.controls.montantrlv.value; // .replace(/ /g, '');
     parametres.recharge.telephone = this.glb.PHONE; // datarecharge.recharge.telephone.replace(/-/g, '');
     parametres.idTerm = this.glb.IDTERM;
     parametres.session = this.glb.IDSESS;
@@ -348,7 +348,7 @@ export class TransfertUniteValeurPage implements OnInit {
     const service = this.rechargeForm.controls.service.value;
 
     switch (service) {
-      case '0005' || '0054' || '0053': {
+      case '0054' || '0053': {
         const transfert = { montant: this.rechargeForm.controls.montantrlv.value, telSource: this.glb.PHONE, opersource: service };
         const params = {
           transfert,
@@ -440,11 +440,13 @@ export class TransfertUniteValeurPage implements OnInit {
           });
         break;
       }
-      case '0022' : {
+      case '0022' || '0005'  : {
         this.serv.afficheloadingWithExit();
         setTimeout(() => {
           const  reference = this.serv.generateUniqueId();
-          const commande = '#150*4*6*' + this.glb.ATPSTIGOIDMERCHAND + '*' + reference + '*1#';
+          const commandetigo   = '#150*4*6*' + this.glb.ATPS_TIGO_IDMERCHAND + '*' + reference + '*1#';
+          const commandeOrange = '#144*5*' + this.glb.ATPS_OM_IDMERCHAND + '*1#';
+          const commande = service === '0022' ? commandetigo : commandeOrange  ;
          // alert(commande);
           this.callNumber.callNumber(commande, true)
             .then(res => { })
