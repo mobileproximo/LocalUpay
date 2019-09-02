@@ -179,7 +179,7 @@ export class TransfertUniteValeurPage implements OnInit {
       // const url = 'https://testwpay.wizall.com/api/merchant/cashout/confirm';
       const header = { Authorization: 'Bearer ' + this.token };
       const params = { otp, msisdn: '765697413', merchant_msisdn: '773914791', merchant_pin: '1001' };
-      this.serv.post(url, params, header).then(data => {
+      this.serv.post(url, params, header).then((data: { data: string; }) => {
         this.serv.dismissloadin();
         // this.serv.dismissloadin();
         const reponse = JSON.parse(data.data);
@@ -196,7 +196,7 @@ export class TransfertUniteValeurPage implements OnInit {
 
         }
       })
-        .catch(err => {
+        .catch((err: { status: number; }) => {
           this.serv.dismissloadin();
           if (err.status === 500) {
             this.serv.showError('Une erreur interne s\'est produite ERREUR 500 ' + JSON.stringify(err));
@@ -216,7 +216,7 @@ export class TransfertUniteValeurPage implements OnInit {
         parametres.recharge.numtrx = this.idtrxEmoney;
         parametres.recharge.codevalidation    = otp;
         parametres.recharge.montant   = this.rechargeForm.controls.montantrlv.value.replace(/ /g, '');
-        this.serv.posts('recharge/validationemoney.php', parametres, {}).then(data => {
+        this.serv.posts('recharge/validationemoney.php', parametres, {}).then((data: { data: string; }) => {
           const reponse = JSON.parse(data.data);
           if (reponse.returnCode) {
 
@@ -227,7 +227,7 @@ export class TransfertUniteValeurPage implements OnInit {
             this.serv.dismissloadin();
             this.serv.showError('Reponse inattendue');
           }
-        }).catch(err => {
+        }).catch((err: { status: number; }) => {
           this.serv.dismissloadin();
           if (err.status === 500) {
             this.serv.showError('Une erreur interne s\'est produite ERREUR 500 ' + JSON.stringify(err));
@@ -241,7 +241,7 @@ export class TransfertUniteValeurPage implements OnInit {
 
     }
   }
-  processpostecash(message) {
+  processpostecash(message: { substr: { (arg0: number, arg1: number): string; (arg0: any, arg1: any): void; }; indexOf: { (arg0: string): number; (arg0: string): void; }; }) {
     if (message.substr(0, 42) === 'Vous avez effectue une demande de debit de') {
       const v = message.substr(message.indexOf(':') + 2, message.indexOf('.'));
       const otp = v.substr(0, v.indexOf('.'));
@@ -253,7 +253,7 @@ export class TransfertUniteValeurPage implements OnInit {
       parametre.recharge.pin = this.codepin;
       parametre.idTerm = this.glb.IDTERM;
       parametre.session = this.glb.IDSESS;
-      this.serv.posts('recharge/retraitpostcash.php', parametre, {}).then(data => {
+      this.serv.posts('recharge/retraitpostcash.php', parametre, {}).then((data: { data: string; }) => {
           this.serv.dismissloadin();
           const reponse = JSON.parse(data.data);
           if (reponse.returnCode === '0') {
@@ -263,7 +263,7 @@ export class TransfertUniteValeurPage implements OnInit {
           } else {
             this.serv.showError(reponse.errorLabel);
           }
-        }).catch(err => {
+        }).catch((err: any) => {
           this.serv.dismissloadin();
           this.serv.showError('Impossible d\'atteindre le serveur');
         });
@@ -283,7 +283,7 @@ export class TransfertUniteValeurPage implements OnInit {
     parametres.recharge.telephone = this.glb.PHONE; // datarecharge.recharge.telephone.replace(/-/g, '');
     parametres.idTerm = this.glb.IDTERM;
     parametres.session = this.glb.IDSESS;
-    this.serv.posts('recharge/cashinMoga.php', parametres, {}).then(data => {
+    this.serv.posts('recharge/cashinMoga.php', parametres, {}).then((data: { data: string; }) => {
       this.serv.dismissloadin();
       const reponse = JSON.parse(data.data);
       if (reponse.returnCode) {
@@ -312,7 +312,7 @@ export class TransfertUniteValeurPage implements OnInit {
       }
 
     }
-    ).catch(err => {
+    ).catch((err: { status: number; }) => {
       this.serv.dismissloadin();
       if (err.status === 500) {
         this.serv.showError('Une erreur interne s\'est produit ERREUR 500');
@@ -368,7 +368,7 @@ export class TransfertUniteValeurPage implements OnInit {
         };
         this.serv.afficheloadingWithExit();
         let url = 'https://testwpay.wizall.com/o/token/';
-        this.serv.post(url, params).then(data => {
+        this.serv.post(url, params).then((data: { data: string; }) => {
           // this.serv.dismissloadin();
 
           const reponse = JSON.parse(data.data);
@@ -384,13 +384,13 @@ export class TransfertUniteValeurPage implements OnInit {
             };
             this.token = reponse.access_token;
             const header = { Authorization: 'Bearer ' + reponse.access_token };
-            this.serv.post(url, params, header).then(data => {
+            this.serv.post(url, params, header).then((data: { data: string; }) => {
               // this.serv.dismissloadin();
               const reponse = JSON.parse(data.data);
               //  alert('reponse init ' + JSON.stringify(reponse));
             })
 
-              .catch(err => {
+              .catch((err: { status: number; }) => {
                 this.serv.dismissloadin();
                 if (err.status === 500) {
                   this.serv.showError('Une erreur interne s\'est produite ERREUR 500 ' + JSON.stringify(err));
@@ -400,7 +400,7 @@ export class TransfertUniteValeurPage implements OnInit {
               });
           }
         })
-          .catch(err => {
+          .catch((err: { status: number; }) => {
             this.serv.dismissloadin();
             if (err.status === 500) {
               this.serv.showError('Une erreur interne s\'est produit ERREUR 500 ' + JSON.stringify(err));
@@ -425,14 +425,14 @@ export class TransfertUniteValeurPage implements OnInit {
     }
 
   }
-lancementussd(service){
+lancementussd(service: string){
   this.serv.afficheloadingWithExit();
   setTimeout(() => {
     const  reference = this.serv.generateUniqueId();
     const commandetigo   = '#150*4*6*' + this.glb.ATPS_TIGO_IDMERCHAND + '*' + reference + '*1#';
     const commandeOrange = '#144*5*' + this.glb.ATPS_OM_IDMERCHAND + '*1#';
     const commande = service === '0022' ? commandetigo : commandeOrange  ;
-   // alert(commande);
+    alert(commande);
     this.callNumber.callNumber(commande, true)
       .then(res => { })
       .catch(err => {
@@ -440,7 +440,7 @@ lancementussd(service){
       });
   }, 200);
 }
-initOperation(service){
+initOperation(service: string){
   const transfert = { montant: this.rechargeForm.controls.montantrlv.value, telSource: this.glb.PHONE, opersource: service };
   const params = {
     transfert,
@@ -451,7 +451,7 @@ initOperation(service){
   data.idTerm = this.glb.IDTERM;
   data.session = this.glb.IDSESS;
   this.serv.afficheloadingWithExit();
-  this.serv.posts('recharge/initcashoutoper.php', params, {}).then(data => {
+  this.serv.posts('recharge/initcashoutoper.php', params, {}).then((data: { data: string; }) => {
     const reponse = JSON.parse(data.data);
     if (reponse.returnCode) {
       if (reponse.returnCode === '0') {
@@ -467,7 +467,7 @@ initOperation(service){
       this.serv.showError('Reponse inattendue ');
     }
   }
-  ).catch(err => {
+  ).catch((err: { status: number; }) => {
     this.serv.dismissloadin();
     if (err.status === 500) {
       this.serv.showError('Une erreur interne s\'est produit ERREUR 500');
