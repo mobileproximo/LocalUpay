@@ -348,44 +348,14 @@ export class TransfertUniteValeurPage implements OnInit {
     const service = this.rechargeForm.controls.service.value;
 
     switch (service) {
-      case '0054' || '0053': {
-        const transfert = { montant: this.rechargeForm.controls.montantrlv.value, telSource: this.glb.PHONE, opersource: service };
-        const params = {
-          transfert,
-          idTerm: this.glb.IDTERM,
-          session: this.glb.IDSESS
-        };
-        const data: any = {};
-        data.idTerm = this.glb.IDTERM;
-        data.session = this.glb.IDSESS;
-        this.serv.afficheloadingWithExit();
-        this.serv.posts('recharge/initcashoutoper.php', params, {}).then(data => {
-          const reponse = JSON.parse(data.data);
-          if (reponse.returnCode) {
-            if (reponse.returnCode === '0') {
-              if (service === '0054') {
-                this.idtrxEmoney = reponse.numtrx;
-              }
-
-            } else {
-              this.serv.showError(reponse.errorLabel);
-            }
-
-          } else {
-            this.serv.showError('Reponse inattendue ');
-          }
-        }
-        ).catch(err => {
-          this.serv.dismissloadin();
-          if (err.status === 500) {
-            this.serv.showError('Une erreur interne s\'est produit ERREUR 500');
-          } else {
-            this.serv.showError('Impossible d\'atteindre le serveur veuillez réessayer');
-          }
-        });
+      case '0054' : {
+        this.initOperation(service);
         break;
       }
-
+      case '0053': {
+        this.initOperation(service);
+        break;
+      }
       case '0057': {
         const params = {
           username: 'test',
@@ -440,20 +410,12 @@ export class TransfertUniteValeurPage implements OnInit {
           });
         break;
       }
-      case '0022' || '0005': {
-        this.serv.afficheloadingWithExit();
-        setTimeout(() => {
-          const  reference = this.serv.generateUniqueId();
-          const commandetigo   = '#150*4*6*' + this.glb.ATPS_TIGO_IDMERCHAND + '*' + reference + '*1#';
-          const commandeOrange = '#144*5*' + this.glb.ATPS_OM_IDMERCHAND + '*1#';
-          const commande = service === '0022' ? commandetigo : commandeOrange  ;
-         // alert(commande);
-          this.callNumber.callNumber(commande, true)
-            .then(res => { })
-            .catch(err => {
-              this.serv.dismissloadin();
-            });
-        }, 200);
+      case '0022': {
+        this.lancementussd(service);
+        break;
+      }
+      case '0005': {
+        this.lancementussd(service);
         break;
       }
       default: {
@@ -463,7 +425,56 @@ export class TransfertUniteValeurPage implements OnInit {
     }
 
   }
+lancementussd(service){
+  this.serv.afficheloadingWithExit();
+  setTimeout(() => {
+    const  reference = this.serv.generateUniqueId();
+    const commandetigo   = '#150*4*6*' + this.glb.ATPS_TIGO_IDMERCHAND + '*' + reference + '*1#';
+    const commandeOrange = '#144*5*' + this.glb.ATPS_OM_IDMERCHAND + '*1#';
+    const commande = service === '0022' ? commandetigo : commandeOrange  ;
+   // alert(commande);
+    this.callNumber.callNumber(commande, true)
+      .then(res => { })
+      .catch(err => {
+        this.serv.dismissloadin();
+      });
+  }, 200);
+}
+initOperation(service){
+  const transfert = { montant: this.rechargeForm.controls.montantrlv.value, telSource: this.glb.PHONE, opersource: service };
+  const params = {
+    transfert,
+    idTerm: this.glb.IDTERM,
+    session: this.glb.IDSESS
+  };
+  const data: any = {};
+  data.idTerm = this.glb.IDTERM;
+  data.session = this.glb.IDSESS;
+  this.serv.afficheloadingWithExit();
+  this.serv.posts('recharge/initcashoutoper.php', params, {}).then(data => {
+    const reponse = JSON.parse(data.data);
+    if (reponse.returnCode) {
+      if (reponse.returnCode === '0') {
+        if (service === '0054') {
+          this.idtrxEmoney = reponse.numtrx;
+        }
 
+      } else {
+        this.serv.showError(reponse.errorLabel);
+      }
 
+    } else {
+      this.serv.showError('Reponse inattendue ');
+    }
+  }
+  ).catch(err => {
+    this.serv.dismissloadin();
+    if (err.status === 500) {
+      this.serv.showError('Une erreur interne s\'est produit ERREUR 500');
+    } else {
+      this.serv.showError('Impossible d\'atteindre le serveur veuillez réessayer');
+    }
+  });
+}
 
 }
