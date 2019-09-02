@@ -440,7 +440,7 @@ export class TransfertUniteValeurPage implements OnInit {
           });
         break;
       }
-      case '0022' || '0005'  : {
+      case '0022' || '0005': {
         this.serv.afficheloadingWithExit();
         setTimeout(() => {
           const  reference = this.serv.generateUniqueId();
