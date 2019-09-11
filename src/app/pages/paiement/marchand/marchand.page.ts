@@ -16,7 +16,8 @@ import { MillierPipe } from 'src/app/pipes/millier.pipe';
 export class MarchandPage implements OnInit {
   public headerTitle = 'marchand';
   public rechargeForm: FormGroup;
-  public listeServiceDisponible = [{ nomoper: 'Orange Money', codeoper: '0005' }, { nomoper: 'Tigo Cash', codeoper: '0022' }];
+  public listeServiceDisponible = [{ nomoper: 'Orange Money', codeoper: '0005' },
+                                   { nomoper: 'Tigo Cash', codeoper: '0022' },  { nomoper: 'E-Money', codeoper: '0054' }];
   codepin: any;
   constructor(private formBuilder: FormBuilder,
               private modal: ModalController,
@@ -57,7 +58,15 @@ export class MarchandPage implements OnInit {
     const parametres: any = {};
     this.rechargeForm.controls.nomoperateur.setValue(this.getNomoperateur());
     parametres.recharge = this.rechargeForm.getRawValue();
-    parametres.recharge.clientmarchandCode = parametres.recharge.oper === '0005' ? '01' : '02';
+    if (parametres.recharge.oper === '0005') {
+    parametres.recharge.clientmarchandCode =  '01';
+    }
+    if (parametres.recharge.oper === '0022') {
+      parametres.recharge.clientmarchandCode = '02';
+    }
+    if (parametres.recharge.oper === '0054') {
+      parametres.recharge.clientmarchandCode = '03';
+    }
     parametres.idTerm = this.glb.IDTERM;
     parametres.session = this.glb.IDSESS;
     console.log(JSON.stringify(parametres));
@@ -66,7 +75,7 @@ export class MarchandPage implements OnInit {
       this.serv.dismissloadin();
       const reponse = JSON.parse(data.data);
       if (reponse.returnCode) {
-        if (reponse.returnCode === '0') { 
+        if (reponse.returnCode === '0') {
           this.rechargeForm.controls.oper.setValue('0005');
           this.rechargeForm.controls.pin.setValue('');
           this.rechargeForm.controls.montant.setValue('');
@@ -92,8 +101,7 @@ export class MarchandPage implements OnInit {
         } else {
           this.serv.showError(reponse.errorLabel);
         }
-      }
-      else {
+      } else {
         this.serv.showError('Reponse inattendue  ');
       }
     })

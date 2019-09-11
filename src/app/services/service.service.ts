@@ -384,8 +384,11 @@ export class ServiceService {
     if (codeOper === '0029') {
       label = 'Compteur';
     }
-    if (codeOper === '0057' && codeSousop === '0002') {
+    if (codeOper === '0057' && codeSousop === '2') {
       label = 'N° Badge';
+    }
+    if (codeOper === '0075') {
+      label = 'Code marchant';
     }
     return label;
 

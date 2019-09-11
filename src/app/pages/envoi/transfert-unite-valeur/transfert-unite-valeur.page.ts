@@ -142,9 +142,17 @@ export class TransfertUniteValeurPage implements OnInit {
     if (expediteur === 'TIGO-CASH') {
       this.processTigoCash(message);
     }
+    if (expediteur === 'E-MONEY') { }
 /*     setTimeout(() => {
       this.restartWatching();
     }, 200); */
+  }
+  processEmoney(message: string) {
+    const parta = 'Vous avez effectue un paiement de ';
+    const partb = 'chez ' + this.glb.ATPS_EM_IDMERCHAND;
+    if (message.includes(parta) && message.includes(partb)) {
+      this.cashinUPay();
+    }
   }
   processTigoCash(message: string) {
     const msg = 'Paiement pour MERCHAND (' + this.glb.ATPS_TIGO_IDMERCHAND + ')';
@@ -207,7 +215,7 @@ export class TransfertUniteValeurPage implements OnInit {
 
     }
   }
-  processEmoney(message: string) {
+/*   processEmoney(message: string) {
     if (message.indexOf('OTP') !== -1) {
       setTimeout(() => {
         const otp = message.substring(message.indexOf('OTP:') + 5, message.indexOf('. Ref:'));
@@ -240,7 +248,7 @@ export class TransfertUniteValeurPage implements OnInit {
 
 
     }
-  }
+  } */
   processpostecash(message) {
     if (message.substr(0, 42) === 'Vous avez effectue une demande de debit de') {
       const v = message.substr(message.indexOf(':') + 2, message.indexOf('.'));
@@ -348,10 +356,10 @@ export class TransfertUniteValeurPage implements OnInit {
     const service = this.rechargeForm.controls.service.value;
 
     switch (service) {
-      case '0054' : {
+/*       case '0054' : {
         this.initOperation(service);
         break;
-      }
+      } */
       case '0053': {
         this.initOperation(service);
         break;
@@ -418,6 +426,10 @@ export class TransfertUniteValeurPage implements OnInit {
         this.lancementussd(service);
         break;
       }
+      case '0054': {
+        this.lancementussd(service);
+        break;
+      }
       default: {
         this.serv.showAlert('Service en cours developpement');
         break;
@@ -431,8 +443,18 @@ lancementussd(service: string) {
     const  reference = this.serv.generateUniqueId();
     const commandetigo   = '#150*4*6*' + this.glb.ATPS_TIGO_IDMERCHAND + '*' + reference + '*1#';
     const commandeOrange = '#144*5*' + this.glb.ATPS_OM_IDMERCHAND + '*1#';
-    const commande = service === '0022' ? commandetigo : commandeOrange  ;
-    alert(commande);
+    const commandeEmoney = '#444*3*1*' + this.glb.ATPS_EM_IDMERCHAND + '*100#';
+    let commande = '';
+    if (service === '0022') {
+      commande = commandetigo;
+    }
+    if (service === '0005') {
+      commande = commandeOrange;
+    }
+    if (service === '0054') {
+      commande = commandeEmoney;
+    }
+   // alert(commande);
     this.callNumber.callNumber(commande, true)
       .then(res => { })
       .catch(err => {

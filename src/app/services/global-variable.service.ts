@@ -38,7 +38,8 @@ export class GlobalVariableService {
   public active3 = false;
   public active4 = false;
   public ATPS_TIGO_IDMERCHAND = 1213;
-  public ATPS_OM_IDMERCHAND = 1213;
+  public ATPS_OM_IDMERCHAND = 116215;
+  public ATPS_EM_IDMERCHAND = 100033;
   PHONE: any ;
   NUMCOMPTE: any = '';
   URLUPLOAD = 'http://192.168.4.63:8080/amifa-1/';
