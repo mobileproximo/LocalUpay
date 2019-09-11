@@ -442,7 +442,7 @@ lancementussd(service: string) {
   setTimeout(() => {
     const  reference = this.serv.generateUniqueId();
     const commandetigo   = '#150*4*6*' + this.glb.ATPS_TIGO_IDMERCHAND + '*' + reference + '*1#';
-    const commandeOrange = '#144*5*' + this.glb.ATPS_OM_IDMERCHAND + '*1#';
+    const commandeOrange = '#144#5*' + this.glb.ATPS_OM_IDMERCHAND + '*1#';
     const commandeEmoney = '#444*3*1*' + this.glb.ATPS_EM_IDMERCHAND + '*100#';
     let commande = '';
     if (service === '0022') {
@@ -454,7 +454,7 @@ lancementussd(service: string) {
     if (service === '0054') {
       commande = commandeEmoney;
     }
-   // alert(commande);
+   alert(commande);
     this.callNumber.callNumber(commande, true)
       .then(res => { })
       .catch(err => {
